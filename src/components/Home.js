@@ -14,6 +14,11 @@ const Home = () => {
         {user ? (
           <>
             <h3 style={{ color: "white" }}>Welcome {user.name}</h3>
+            <Link to="/me">
+              <button type="button" className="btn-right">
+                View Profile
+              </button>
+            </Link>
           </>
         ) : (
           <Fragment>

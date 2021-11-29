@@ -2,7 +2,11 @@ import React, { Fragment, useState, useEffect } from "react";
 import { useAlert } from "react-alert";
 import { useSelector, useDispatch } from "react-redux";
 
-import { clearErrors, updateUser, loadUser } from "../../actions/userActions";
+import {
+  clearErrors,
+  updateProfile,
+  loadUser,
+} from "../../actions/userActions";
 import { UPDATE_USER_RESET } from "../../constants/userConstants";
 const UpdateProfile = ({ history }) => {
   const alert = useAlert();
@@ -20,9 +24,11 @@ const UpdateProfile = ({ history }) => {
       setName(user.name);
       setEmail(user.email);
     }
+    console.log(error);
 
     if (error) {
       alert.error(error);
+      console.log(error);
       dispatch(clearErrors);
     }
 
@@ -39,7 +45,8 @@ const UpdateProfile = ({ history }) => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    dispatch(updateUser(name, email));
+    console.log("name, email: ", name, email);
+    dispatch(updateProfile(name, email));
   };
 
   return (

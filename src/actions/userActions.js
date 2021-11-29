@@ -29,16 +29,16 @@ import axios from "axios";
 //login
 export const login = (email, password) => async (dispatch) => {
   try {
-    dispatch({ type: LOGIN_REQUEST });
+    dispatch({
+      type: LOGIN_REQUEST,
+    });
     const config = {
       headers: {
         "Content-Type": "application/json",
       },
     };
-    console.log(email, password);
-
     const { data } = await axios.post(
-      "https://radiant-plains-42276.herokuapp.com/api/v1/login",
+      `/api/v1/login`,
       { email, password },
       config
     );
@@ -48,7 +48,7 @@ export const login = (email, password) => async (dispatch) => {
       payload: data.user,
     });
   } catch (error) {
-    console.log(error.response.data.message);
+    console.log(error.response);
     dispatch({
       type: LOGIN_FAIL,
       payload: error.response.data.message,
@@ -56,17 +56,19 @@ export const login = (email, password) => async (dispatch) => {
   }
 };
 
-//register
+//Register user
 export const register = (name, email, password) => async (dispatch) => {
   try {
     dispatch({ type: REGISTER_USER_REQUEST });
+
     const config = {
       headers: {
         "Content-Type": "application/json",
       },
     };
+
     const { data } = await axios.post(
-      "https://radiant-plains-42276.herokuapp.com/api/v1/register",
+      "/api/v1/register",
       { name, email, password },
       config
     );
@@ -76,24 +78,21 @@ export const register = (name, email, password) => async (dispatch) => {
       payload: data.user,
     });
   } catch (error) {
-    console.log("error", error);
     dispatch({
       type: REGISTER_USER_FAIL,
-      payload: error.response,
+      payload: error.response.data.message,
     });
   }
 };
 
-//load user
+//loading user
 export const loadUser = () => async (dispatch) => {
   try {
     dispatch({
       type: LOAD_USER_REQUEST,
     });
 
-    const { data } = await axios.get(
-      "https://radiant-plains-42276.herokuapp.com/api/v1/me"
-    );
+    const { data } = await axios.get("/api/v1/me");
 
     dispatch({
       type: LOAD_USER_SUCCESS,
@@ -107,10 +106,10 @@ export const loadUser = () => async (dispatch) => {
   }
 };
 
-//logout
+//logout user
 export const logout = () => async (dispatch) => {
   try {
-    await axios.get("https://radiant-plains-42276.herokuapp.com/api/v1/logout");
+    const { data } = await axios.get("/api/v1/logout");
 
     dispatch({
       type: LOGOUT_SUCCESS,
@@ -123,21 +122,23 @@ export const logout = () => async (dispatch) => {
   }
 };
 
-//update user profile
-export const updateUser = (name, email) => async (dispatch) => {
+//Update user profile
+export const updateProfile = (name, email) => async (dispatch) => {
   try {
     dispatch({ type: UPDATE_USER_REQUEST });
+
     const config = {
       headers: {
         "Content-Type": "application/json",
       },
     };
+
     const { data } = await axios.patch(
-      "https://radiant-plains-42276.herokuapp.com/api/v1/me/update",
+      "/api/v1/me/update",
       { name, email },
       config
     );
-
+    console.log(data);
     dispatch({
       type: UPDATE_USER_SUCCESS,
       payload: data.success,
@@ -150,19 +151,28 @@ export const updateUser = (name, email) => async (dispatch) => {
   }
 };
 
+//clear errors
+export const clearErrors = () => async (dispatch) => {
+  dispatch({
+    type: CLEAR_ERRORS,
+  });
+};
+
 //update password
 export const updatePassword =
-  (oldPassword, password, passwordConfirm) => async (dispatch) => {
+  (oldPassword, newPassword) => async (dispatch) => {
     try {
       dispatch({ type: UPDATE_PASSWORD_REQUEST });
+
       const config = {
         headers: {
           "Content-Type": "application/json",
         },
       };
+
       const { data } = await axios.patch(
-        "https://radiant-plains-42276.herokuapp.com/api/v1/password/update",
-        { oldPassword, password, passwordConfirm },
+        "/api/v1/password/update",
+        { oldPassword, newPassword },
         config
       );
 
@@ -182,16 +192,21 @@ export const updatePassword =
 export const forgotPassword = (email) => async (dispatch) => {
   try {
     dispatch({ type: FORGOT_PASSWORD_REQUEST });
+
     const config = {
       headers: {
         "Content-Type": "application/json",
       },
     };
+    console.log("data to be sent");
+
     const { data } = await axios.post(
-      "https://radiant-plains-42276.herokuapp.com/api/v1/password/forgot",
+      "/api/v1/password/forgot",
       { email },
       config
     );
+    console.log("data send");
+    console.log(data);
 
     dispatch({
       type: FORGOT_PASSWORD_SUCCESS,
@@ -205,35 +220,33 @@ export const forgotPassword = (email) => async (dispatch) => {
   }
 };
 
-//reset password
-export const resetPassword =
-  (token, password, passwordConfirm) => async (dispatch) => {
-    try {
-      dispatch({ type: NEW_PASSWORD_REQUEST });
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-      const { data } = await axios.patch(
-        `https://radiant-plains-42276.herokuapp.com/api/v1/password/reset/${token}`,
-        { password, passwordConfirm },
-        config
-      );
+// Reset password
+export const resetPassword = (token, passwords) => async (dispatch) => {
+  try {
+    console.log(token, passwords);
+    dispatch({ type: NEW_PASSWORD_REQUEST });
 
-      dispatch({
-        type: NEW_PASSWORD_SUCCESS,
-        payload: data.success,
-      });
-    } catch (error) {
-      dispatch({
-        type: NEW_PASSWORD_FAIL,
-        payload: error.response.data.message,
-      });
-    }
-  };
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    console.log("passwords:", passwords);
+    const { data } = await axios.patch(
+      `/api/v1/password/reset/${token}`,
+      passwords,
+      config
+    );
+    console.log(data);
 
-//clear errors
-export const clearErrors = () => async (dispatch) => {
-  dispatch({ type: CLEAR_ERRORS });
+    dispatch({
+      type: NEW_PASSWORD_SUCCESS,
+      payload: data.success,
+    });
+  } catch (error) {
+    dispatch({
+      type: NEW_PASSWORD_FAIL,
+      payload: error.response.data.message,
+    });
+  }
 };

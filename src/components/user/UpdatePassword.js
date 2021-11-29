@@ -26,12 +26,15 @@ const UpdatePassword = ({ history }) => {
 
     if (error) {
       alert.error(error);
+      console.log(error);
       dispatch(clearErrors);
     }
   }, [dispatch, alert, isUpdated, error, history]);
 
   const submitHandler = (e) => {
     e.preventDefault();
+
+    console.log(oldPassword, newPassword);
     dispatch(updatePassword(oldPassword, newPassword));
   };
   return (
